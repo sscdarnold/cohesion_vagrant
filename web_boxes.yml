@@ -1,0 +1,44 @@
+---
+- name: Ansible Provisioner for Vagrant
+  hosts: all
+  become: true
+  gather_facts: false
+  vars:
+    ansible_user: vagrant
+    current_java: "java-21"
+  tasks:
+    - name: Install base apps
+      ansible.builtin.dnf:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - nginx
+        - policycoreutils-python-utils
+        - java-21-openjdk
+        - java-21-openjdk-devel
+
+    - name: Ensure nginx is running
+      ansible.builtin.service:
+        name: nginx
+        state: restarted
+
+    - name: Set JAVA_HOME systemwide
+      ansible.builtin.template:
+        src: java_home.sh.j2
+        dest: /etc/profile.d/java_home.sh.j2
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Add http to allow through firewall
+      ansible.posix.firewalld:
+        service: http
+        state: enabled
+        permanent: true
+        immediate: true
+
+    - name: Allow network connect for http
+      ansible.posix.seboolean:
+        name: httpd_can_network_connect
+        state: true
+        persistent: true
