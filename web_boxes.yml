@@ -20,12 +20,19 @@
     - name: Ensure nginx is running
       ansible.builtin.service:
         name: nginx
-        state: restarted
+        state: started
+        enabled: true
+
+    - name: Ensure firewalld is running
+      ansible.builtin.service:
+        name: firewalld
+        state: started
+        enabled: true
 
     - name: Set JAVA_HOME systemwide
       ansible.builtin.template:
         src: java_home.sh.j2
-        dest: /etc/profile.d/java_home.sh.j2
+        dest: /etc/profile.d/java_home.sh
         owner: root
         group: root
         mode: '0644'
