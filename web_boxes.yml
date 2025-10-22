@@ -15,13 +15,14 @@
         - policycoreutils-python-utils
         - java-21-openjdk
         - java-21-openjdk-devel
-    
+
     - name: Install web base apps
       ansible.builtin.dnf:
         name: "{{ item }}"
         state: present
       with_items:
         - nginx
+      when: inventory_hostname in groups['web']
 
     - name: Install db base apps
       ansible.builtin.dnf:
@@ -30,7 +31,8 @@
       with_items:
         - mysql-release-el9
         - mysql-common
-    
+      when: inventory_hostname in groups['db']
+
     - name: Ensure nginx is running
       ansible.builtin.service:
         name: nginx
