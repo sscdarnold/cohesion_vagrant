@@ -42,7 +42,7 @@
 
     - name: Ensure mysql is running
       ansible.builtin.service:
-        name: mysql
+        name: mysqld
         state: started
         enabled: true
       when: inventory_hostname in groups['db']
