@@ -12,16 +12,38 @@
         name: "{{ item }}"
         state: present
       with_items:
-        - nginx
         - policycoreutils-python-utils
         - java-21-openjdk
         - java-21-openjdk-devel
+    
+    - name: Install web base apps
+      ansible.builtin.dnf:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - nginx
 
+    - name: Install db base apps
+      ansible.builtin.dnf:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - mysql-release-el9
+        - mysql-common
+    
     - name: Ensure nginx is running
       ansible.builtin.service:
         name: nginx
         state: started
         enabled: true
+      when: inventory_hostname in groups['web']
+
+    - name: Ensure mysql is running
+      ansible.builtin.service:
+        name: mysql
+        state: started
+        enabled: true
+      when: inventory_hostname in groups['db']
 
     - name: Ensure firewalld is running
       ansible.builtin.service:
@@ -43,9 +65,19 @@
         state: enabled
         permanent: true
         immediate: true
+      when: inventory_hostname in groups['web']
+    
+    - name: Add mysql to allow through firewall
+      ansible.posix.firewalld:
+        service: mysql
+        state: enabled
+        permanent: true
+        immediate: true
+      when: inventory_hostname in groups['db']
 
     - name: Allow network connect for http
       ansible.posix.seboolean:
         name: httpd_can_network_connect
         state: true
         persistent: true
+      when: inventory_hostname in groups['web']
