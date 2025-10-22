@@ -28,14 +28,15 @@ Vagrant.configure("2") do |config|
   config.vm.define "web1" do |web|
    # web.vm.network "private_network", ip: "10.211.56.121" 
   end
-  config.vm.define "web2" do |web|
+  config.vm.define "db0" do |db|
    # web.vm.network "private_network", ip: "10.211.56.122" 
   end
   config.vm.provision "ansible" do |ansible|
     ansible.playbook = "web_boxes.yml"
     ansible.compatibility_mode = "auto"
     ansible.groups = {
-      "web" => ["web0", "web1", "web2"]
+      "web" => ["web0", "web1"],
+      "db" => ["db0"]
     }
   end
 end
