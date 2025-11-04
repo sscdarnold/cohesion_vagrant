@@ -31,7 +31,15 @@ Vagrant.configure("2") do |config|
   config.vm.define "db0" do |db|
    # web.vm.network "private_network", ip: "10.211.56.122" 
   end
-  config.vm.provision "ansible" do |ansible|
+  #config.vm.provision "ansible" do |ansible|
+  #  ansible.playbook = "web_boxes.yml"
+  #  ansible.compatibility_mode = "auto"
+  #  ansible.groups = {
+  #    "web" => ["web0", "web1"],
+  #    "db" => ["db0"]
+  #  }
+  #end
+  config.vm.provision "ansible_local" do |ansible|
     ansible.playbook = "web_boxes.yml"
     ansible.compatibility_mode = "auto"
     ansible.groups = {
